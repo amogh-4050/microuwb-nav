@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<sdf version="1.6" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="ceiling"   default="true"/>
+  <xacro:arg name="furniture" default="true"/>
+
+  <world name="microuwb_room">
+
+    <!-- Lighting -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <scene>
+      <ambient>0.4 0.4 0.4 1.0</ambient>
+      <background>0.7 0.7 0.7 1.0</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- Physics -->
+    <physics name="default_physics" default="true" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- ───────────────── FLOOR ───────────────── -->
+    <model name="floor">
+      <static>true</static>
+      <pose>2.5 2.0 -0.05 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>5.0 4.0 0.1</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 4.0 0.1</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1.0</ambient>
+            <diffuse>0.6 0.6 0.6 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ───────────────── WALLS ───────────────── -->
+    <!-- South wall (y=0) -->
+    <model name="wall_south">
+      <static>true</static>
+      <pose>2.5 0.05 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>5.0 0.1 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 0.1 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1.0</ambient><diffuse>0.8 0.8 0.8 1.0</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- North wall (y=4) -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>2.5 3.95 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>5.0 0.1 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>5.0 0.1 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1.0</ambient><diffuse>0.8 0.8 0.8 1.0</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- West wall (x=0) -->
+    <model name="wall_west">
+      <static>true</static>
+      <pose>0.05 2.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.1 4.0 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.1 4.0 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1.0</ambient><diffuse>0.8 0.8 0.8 1.0</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- East wall (x=5) -->
+    <model name="wall_east">
+      <static>true</static>
+      <pose>4.95 2.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.1 4.0 3.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.1 4.0 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1.0</ambient><diffuse>0.8 0.8 0.8 1.0</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ───────────────── CEILING (toggleable) ───────────────── -->
+    <xacro:if value="${'$(arg ceiling)' == 'true'}">
+      <model name="ceiling">
+        <static>true</static>
+        <pose>2.5 2.0 3.05 0 0 0</pose>
+        <link name="link">
+          <collision name="collision">
+            <geometry><box><size>5.0 4.0 0.1</size></box></geometry>
+          </collision>
+          <visual name="visual">
+            <geometry><box><size>5.0 4.0 0.1</size></box></geometry>
+            <material><ambient>0.9 0.9 0.9 1.0</ambient><diffuse>0.9 0.9 0.9 1.0</diffuse></material>
+          </visual>
+        </link>
+      </model>
+    </xacro:if>
+
+    <!-- ───────────────── FURNITURE (toggleable) ───────────────── -->
+    <xacro:if value="${'$(arg furniture)' == 'true'}">
+      <!-- bookshelf near west wall, does not block all LOS diagonals -->
+      <include>
+        <uri>model://bookshelf</uri>
+        <name>bookshelf</name>
+        <pose>0.5 1.0 0 0 0 0</pose>
+      </include>
+
+      <!-- cafe_table near centre, creates NLOS for a4 anchor -->
+      <include>
+        <uri>model://cafe_table</uri>
+        <name>cafe_table</name>
+        <pose>2.5 2.5 0 0 0 0</pose>
+      </include>
+
+      <!-- cabinet near east wall -->
+      <include>
+        <uri>model://cabinet</uri>
+        <name>cabinet</name>
+        <pose>4.5 3.0 0 0 0 1.5708</pose>
+      </include>
+    </xacro:if>
+
+    <!-- ───────────────── UWB ANCHORS ───────────────── -->
+    <!-- a0: SW corner high -->
+    <model name="anchor_0">
+      <static>true</static>
+      <pose>0.1 0.1 2.5 0 0 0</pose>
+      <link name="link">
+        <visual name="body">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.0 0.0 1.0</ambient>
+            <diffuse>1.0 0.0 0.0 1.0</diffuse>
+            <emissive>0.8 0.0 0.0 1.0</emissive>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- a1: SE corner high -->
+    <model name="anchor_1">
+      <static>true</static>
+      <pose>4.9 0.1 2.5 0 0 0</pose>
+      <link name="link">
+        <visual name="body">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.0 0.0 1.0</ambient>
+            <diffuse>1.0 0.0 0.0 1.0</diffuse>
+            <emissive>0.8 0.0 0.0 1.0</emissive>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- a2: NW corner high -->
+    <model name="anchor_2">
+      <static>true</static>
+      <pose>0.1 3.9 2.5 0 0 0</pose>
+      <link name="link">
+        <visual name="body">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.0 0.0 1.0</ambient>
+            <diffuse>1.0 0.0 0.0 1.0</diffuse>
+            <emissive>0.8 0.0 0.0 1.0</emissive>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- a3: NE corner high -->
+    <model name="anchor_3">
+      <static>true</static>
+      <pose>4.9 3.9 2.5 0 0 0</pose>
+      <link name="link">
+        <visual name="body">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.0 0.0 1.0</ambient>
+            <diffuse>1.0 0.0 0.0 1.0</diffuse>
+            <emissive>0.8 0.0 0.0 1.0</emissive>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- a4: centre overhead -->
+    <model name="anchor_4">
+      <static>true</static>
+      <pose>2.5 2.0 2.8 0 0 0</pose>
+      <link name="link">
+        <visual name="body">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>1.0 0.0 0.0 1.0</ambient>
+            <diffuse>1.0 0.0 0.0 1.0</diffuse>
+            <emissive>0.8 0.0 0.0 1.0</emissive>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.03</radius><length>0.05</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+  </world>
+</sdf>

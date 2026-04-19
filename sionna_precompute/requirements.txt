@@ -1,0 +1,11 @@
+sionna==1.2.1
+mitsuba>=3.5
+drjit>=1.2.0
+jupyter
+nbformat
+nbconvert
+numpy>=1.24
+matplotlib>=3.7
+h5py>=3.9
+pyyaml>=6.0
+# tensorflow is a sionna dependency — version pinned by sionna itself

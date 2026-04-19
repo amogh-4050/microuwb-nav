@@ -1,0 +1,46 @@
+# --- Code review / tooling ---
+.code-review-graph/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
++.Python
++.venv/
++venv/
++env/
++.pytest_cache/
++.mypy_cache/
++.ruff_cache/
++.ipynb_checkpoints/
+
+# --- Build / packaging ---
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# --- ROS2 / colcon runtime outputs ---
+install/
+log/
+compile_commands.json
+.colcon/
+
+# --- Notebook / generated artifacts ---
+*.h5
+*.hdf5
+*.npz
+*.npy
+*.png
+
+# --- Logs / local env ---
+*.log
+.env
+.env.*
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

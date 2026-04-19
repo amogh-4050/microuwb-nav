@@ -1,0 +1,26 @@
+anchors:
+  - id: 0
+    name: "anchor_0"
+    x: 0.1
+    y: 0.1
+    z: 2.5
+  - id: 1
+    name: "anchor_1"
+    x: 4.9
+    y: 0.1
+    z: 2.5
+  - id: 2
+    name: "anchor_2"
+    x: 0.1
+    y: 3.9
+    z: 2.5
+  - id: 3
+    name: "anchor_3"
+    x: 4.9
+    y: 3.9
+    z: 2.5
+  - id: 4
+    name: "anchor_4"
+    x: 2.5
+    y: 2.0
+    z: 2.8

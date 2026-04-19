@@ -1,0 +1,51 @@
+<scene version="2.1.0">
+
+<!-- ITU concrete for all room surfaces (walls, floor, ceiling). -->
+<!-- Thickness matches the Gazebo world wall thickness (0.1 m).  -->
+
+    <bsdf type="itu-radio-material" id="concrete">
+        <string name="type" value="concrete"/>
+        <float name="thickness" value="0.1"/>
+    </bsdf>
+
+<!-- Room: 5 m × 4 m × 3 m, origin at SW floor corner.         -->
+<!-- Interior spans (0,0,0) → (5,4,3) — identical to Gazebo.   -->
+<!-- Surface normals point INTO the room (inward-facing).        -->
+
+    <shape type="ply" id="mesh-floor">
+        <string name="filename" value="meshes/floor.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-ceiling">
+        <string name="filename" value="meshes/ceiling.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-wall-south">
+        <string name="filename" value="meshes/wall_south.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-wall-north">
+        <string name="filename" value="meshes/wall_north.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-wall-west">
+        <string name="filename" value="meshes/wall_west.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-wall-east">
+        <string name="filename" value="meshes/wall_east.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="concrete" name="bsdf"/>
+    </shape>
+
+</scene>
