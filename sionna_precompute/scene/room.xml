@@ -1,11 +1,19 @@
 <scene version="2.1.0">
 
-<!-- ITU concrete for all room surfaces (walls, floor, ceiling). -->
+<!-- ITU concrete for room envelope (walls, floor, ceiling). -->
 <!-- Thickness matches the Gazebo world wall thickness (0.1 m).  -->
 
     <bsdf type="itu-radio-material" id="concrete">
         <string name="type" value="concrete"/>
         <float name="thickness" value="0.1"/>
+    </bsdf>
+
+<!-- ITU wood for furniture bounding boxes. -->
+<!-- Thickness 0.02 m (nominal panel thickness). -->
+
+    <bsdf type="itu-radio-material" id="wood">
+        <string name="type" value="wood"/>
+        <float name="thickness" value="0.02"/>
     </bsdf>
 
 <!-- Room: 5 m × 4 m × 3 m, origin at SW floor corner.         -->
@@ -46,6 +54,27 @@
         <string name="filename" value="meshes/wall_east.ply"/>
         <boolean name="face_normals" value="true"/>
         <ref id="concrete" name="bsdf"/>
+    </shape>
+
+<!-- Furniture bounding boxes. Positions match room.world.xacro models.  -->
+<!-- Each box is an AABB of the Gazebo model's collision geometry.        -->
+
+    <shape type="ply" id="mesh-furniture-bookshelf">
+        <string name="filename" value="meshes/furniture_bookshelf.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="wood" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-furniture-cafe-table">
+        <string name="filename" value="meshes/furniture_cafe_table.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="wood" name="bsdf"/>
+    </shape>
+
+    <shape type="ply" id="mesh-furniture-cabinet">
+        <string name="filename" value="meshes/furniture_cabinet.ply"/>
+        <boolean name="face_normals" value="true"/>
+        <ref id="wood" name="bsdf"/>
     </shape>
 
 </scene>
