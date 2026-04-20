@@ -77,8 +77,8 @@ Future: `firmware/` (nRF52840 Zephyr code), `hardware/` (KiCad PCB).
 |------|-------------|--------|
 | 1 | ROS2 workspace scaffold — 8 packages, colcon build clean | ✓ done |
 | 2 | Gazebo room + 5 UWB anchors + custom messages + latched anchor publisher | ✓ done |
-| 3a-i | Sionna RT scene (Mitsuba 3 room, ITU concrete) + single-point CIR sanity test | ✓ done |
-| 3a-ii | CIR grid sweep over full room interior, HDF5 lookup table | in progress |
+| 3a-i | Sionna RT scene (Mitsuba 3 room, ITU concrete + wood furniture) + single-point CIR sanity test | ✓ done |
+| 3a-ii | CIR grid sweep (93×73×57, 5 anchors), HDF5 lookup table, validation plots | ✓ done |
 | 3b | ROS range publisher — reads HDF5, interpolates at drone pose, adds noise | todo |
 | 4 | Trilateration node — 5-anchor NLLS or weighted least squares | todo |
 | 5 | Kalman filter node — fuses UWB position fix + IMU odometry | todo |
@@ -88,7 +88,7 @@ Future: `firmware/` (nRF52840 Zephyr code), `hardware/` (KiCad PCB).
 | 9 | Full system integration launch + closed-loop demo | todo |
 | 10 | Physical hardware bringup (nRF52840 + DW3000 + custom PCB) | future |
 
-**Validated so far:** step 3a-i single-point CIR — first-path range 3.4112 m vs Euclidean 3.4088 m, error 0.24 cm; LOS correctly detected.
+**Validated so far:** step 3a-i single-point CIR — first-path range 3.4112 m vs Euclidean 3.4088 m, error 0.24 cm; LOS correctly detected. Step 3a-ii grid sweep and validation pipeline written; run `scripts/precompute_cir_table.py` to generate HDF5.
 
 ---
 
