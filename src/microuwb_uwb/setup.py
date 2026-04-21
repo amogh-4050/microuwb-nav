@@ -27,6 +27,8 @@ setup(
             'anchor_publisher = microuwb_uwb.anchor_publisher:main',
             'uwb_range_simulator = microuwb_uwb.uwb_range_simulator:main',
             'test_pose_publisher = microuwb_uwb.test_pose_publisher:main',
+            'trilateration_node = microuwb_uwb.trilateration:main',
+            'verify_trilateration = microuwb_uwb.verify_trilateration:main',
         ],
     },
 )

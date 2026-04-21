@@ -40,9 +40,26 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration("test_trajectory")),
     )
 
+    trilateration = Node(
+        package="microuwb_uwb",
+        executable="trilateration_node",
+        name="trilateration_node",
+        output="screen",
+    )
+
+    verify = Node(
+        package="microuwb_uwb",
+        executable="verify_trilateration",
+        name="verify_trilateration",
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("test_trajectory")),
+    )
+
     return LaunchDescription([
         test_traj_arg,
         world_launch,
         uwb_simulator,
         test_pose_publisher,
+        trilateration,
+        verify,
     ])
