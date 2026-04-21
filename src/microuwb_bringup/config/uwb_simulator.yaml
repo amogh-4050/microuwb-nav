@@ -1,0 +1,20 @@
+uwb_range_simulator:
+  ros__parameters:
+    # Absolute path to the Sionna-generated CIR lookup table
+    cir_table_path: /home/avg_shilp_kid/microuwb_nav_ws/sionna_precompute/data/room_cir_table_full.h5
+
+    # DW3000-realistic timing noise (~80 ps × c ≈ 2.4 cm)
+    update_rate_hz: 10.0
+    sigma_clock_m: 0.02
+
+    # Per-anchor bias: sampled once at startup from uniform(-range, +range)
+    per_anchor_bias_seed: 42
+    per_anchor_bias_range_m: 0.05
+
+    # NLOS extra noise — disabled by default; flip to true to test NLOS degradation
+    enable_nlos_extra_noise: false
+    nlos_extra_noise_sigma_m: 0.10
+    nlos_extra_noise_probability: 0.20
+
+    # Probability that a given anchor measurement is dropped per cycle (~1 % default)
+    dropout_probability: 0.01

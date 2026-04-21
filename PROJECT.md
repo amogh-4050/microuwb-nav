@@ -1,5 +1,9 @@
 # MicroUWB-Nav Simulation
 
+> **TODO (backlog):** `extract_metrics` `first_path_power` extraction returns NaN — fix and
+> regenerate `room_cir_table_full.h5` with proper power-based variance.
+> Currently using LOS-flag binary heuristic (0.005 / 0.050 m²).
+
 Sub-50g indoor quadcopter simulation with UWB-based positioning.
 Proof-of-concept for the physical MicroUWB-Nav drone (nRF52840 + DW3000).
 

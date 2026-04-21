@@ -25,6 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'anchor_publisher = microuwb_uwb.anchor_publisher:main',
+            'uwb_range_simulator = microuwb_uwb.uwb_range_simulator:main',
+            'test_pose_publisher = microuwb_uwb.test_pose_publisher:main',
         ],
     },
 )
