@@ -78,17 +78,21 @@ Future: `firmware/` (nRF52840 Zephyr code), `hardware/` (KiCad PCB).
 | 1 | ROS2 workspace scaffold — 8 packages, colcon build clean | ✓ done |
 | 2 | Gazebo room + 5 UWB anchors + custom messages + latched anchor publisher | ✓ done |
 | 3a-i | Sionna RT scene (Mitsuba 3 room, ITU concrete + wood furniture) + single-point CIR sanity test | ✓ done |
-| 3a-ii | CIR grid sweep (93×73×57, 5 anchors), HDF5 lookup table, validation plots | ✓ done |
-| 3b | ROS range publisher — reads HDF5, interpolates at drone pose, adds noise | todo |
-| 4 | Trilateration node — 5-anchor NLLS or weighted least squares | todo |
-| 5 | Kalman filter node — fuses UWB position fix + IMU odometry | todo |
+| 3a-ii | CIR grid sweep (93×73×57, 5 anchors), HDF5 lookup table (6.6 MB) | ✓ done |
+| 3b | ROS range publisher — HDF5 trilinear interpolation, DW3000 noise model, 10 Hz | ✓ done |
+| 4 | Trilateration node — weighted nonlinear LSQ (LM), median ~5 cm, p95 ~8 cm | ✓ done |
+| 5 | EKF node — fuses UWB position fix + IMU odometry | todo |
 | 6 | Drone URDF + Gazebo plugin (propeller forces, IMU, ground truth) | todo |
 | 7 | Flight controller — cascaded PID, attitude inner loop + position outer loop | todo |
 | 8 | Waypoint navigation + wall avoidance | todo |
 | 9 | Full system integration launch + closed-loop demo | todo |
 | 10 | Physical hardware bringup (nRF52840 + DW3000 + custom PCB) | future |
 
-**Validated so far:** step 3a-i single-point CIR — first-path range 3.4112 m vs Euclidean 3.4088 m, error 0.24 cm; LOS correctly detected. Step 3a-ii grid sweep and validation pipeline written; run `scripts/precompute_cir_table.py` to generate HDF5.
+**Validated so far:**
+- Step 3a-i: first-path range error 0.24 cm vs Euclidean; LOS correctly detected.
+- Step 3a-ii: 93×73×57 grid, 5 cm resolution, LOS% > 85%, p95 range error < 10 cm.
+- Step 3b: `/microuwb/ranges` at 10.000 Hz, per-anchor bias + 2 cm clock noise, variance 0.005 (LOS) / 0.050 (NLOS) m².
+- Step 4: trilateration at 10 Hz; LOS median ~5 cm, p95 ~8 cm; NLOS zones median ≤ 12 cm, p95 ≤ 22 cm. A/B confirmed variance weighting essential (without it p95 spikes to 107–118 cm in NLOS).
 
 ---
 
@@ -101,18 +105,19 @@ Future: `firmware/` (nRF52840 Zephyr code), `hardware/` (KiCad PCB).
 - Gazebo Classic 11
 - Anaconda with a `sionna_env` conda environment (Sionna 1.2.1, see `sionna_precompute/requirements.txt`)
 
-### Simulation (Gazebo room + anchors)
+### Build
 
 ```bash
 cd ~/microuwb_nav_ws
 colcon build --symlink-install
 source install/setup.bash
-ros2 launch microuwb_bringup world.launch.py
 ```
 
-Optional args:
+### Gazebo room + anchors only
+
 ```bash
-ros2 launch microuwb_bringup world.launch.py ceiling:=false furniture:=false
+ros2 launch microuwb_bringup world.launch.py
+# optional: ros2 launch microuwb_bringup world.launch.py ceiling:=false furniture:=false
 ```
 
 Verify anchor topic (TransientLocal QoS required):
@@ -121,17 +126,46 @@ ros2 topic echo /microuwb/anchors \
   --qos-durability transient_local --qos-reliability reliable --once
 ```
 
-### Sionna RT notebooks
+### UWB range simulator + trilateration (steps 3b + 4)
 
+Full stack with figure-8 test trajectory and live error stats:
 ```bash
-source ~/anaconda3/bin/activate
-conda activate sionna_env
-cd ~/microuwb_nav_ws/sionna_precompute
-jupyter notebook
+ros2 launch microuwb_bringup uwb_sim.launch.py test_trajectory:=true
 ```
 
-Open `notebooks/01_scene_sanity.ipynb` first, then `02_single_point_test.ipynb`.
-Rendered images are saved to `sionna_precompute/renders/`.
+Check outputs:
+```bash
+ros2 topic hz /microuwb/ranges              # should be 10.000 Hz
+ros2 topic hz /microuwb/position_estimate   # should be 10.000 Hz
+ros2 topic echo /microuwb/position_estimate # PoseStamped x/y/z estimates
+```
+
+The `verify_trilateration` node (started automatically with `test_trajectory:=true`) logs
+median/p95 error vs ground truth every 2 seconds. Expected: median < 30 cm, p95 < 1 m.
+
+Individual nodes (if launching manually):
+```bash
+ros2 run microuwb_uwb anchor_publisher
+ros2 run microuwb_uwb uwb_range_simulator \
+  --ros-args -p cir_table_path:=/path/to/room_cir_table_full.h5
+ros2 run microuwb_uwb trilateration_node
+ros2 run microuwb_uwb test_pose_publisher   # figure-8 test trajectory
+ros2 run microuwb_uwb verify_trilateration  # error stats
+```
+
+### Sionna RT — regenerate HDF5 table (offline, GPU required)
+
+```bash
+conda activate sionna_env
+cd ~/microuwb_nav_ws/sionna_precompute
+python scripts/precompute_cir_table.py      # ~hours on RTX 4060, writes data/room_cir_table_full.h5
+```
+
+Sanity notebooks:
+```bash
+jupyter notebook
+# 01_scene_sanity.ipynb → 02_single_point_test.ipynb → 03_path_visualization.ipynb
+```
 
 ---
 
