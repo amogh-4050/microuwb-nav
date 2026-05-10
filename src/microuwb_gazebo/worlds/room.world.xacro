@@ -15,6 +15,14 @@
       <shadows>true</shadows>
     </scene>
 
+    <!-- State plugin — provides /gazebo/set_entity_state for respawn guard -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+      <ros>
+        <namespace>/gazebo</namespace>
+      </ros>
+      <update_rate>10.0</update_rate>
+    </plugin>
+
     <!-- Physics -->
     <physics name="default_physics" default="true" type="ode">
       <max_step_size>0.001</max_step_size>

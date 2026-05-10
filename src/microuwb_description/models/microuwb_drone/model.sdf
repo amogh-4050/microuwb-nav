@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="microuwb_drone">
+
+    <!-- ── Body ──────────────────────────────────────────────────────── -->
+    <link name="base_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.05</mass>
+        <inertia>
+          <!-- Solid box 80mm x 80mm x 20mm, m=0.05 kg -->
+          <ixx>2.83e-5</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.83e-5</iyy>
+          <iyz>0</iyz>
+          <izz>5.33e-5</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box><size>0.080 0.080 0.020</size></box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box><size>0.080 0.080 0.020</size></box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+      <!-- IMU — frame_name=base_link avoids a spurious extra link -->
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>false</visualize>
+        <plugin name="imu_plugin" filename="libgazebo_ros_imu_sensor.so">
+          <ros>
+            <remapping>~/out:=/microuwb/imu</remapping>
+          </ros>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+    </link>
+
+    <!-- ── Rotor FL (+x +y) ──────────────────────────────────────────── -->
+    <link name="rotor_fl">
+      <pose>0.040 0.040 0.010 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+        <inertia>
+          <!-- Thin disk r=10mm h=2mm, m=0.002 kg -->
+          <ixx>5.07e-8</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5.07e-8</iyy>
+          <iyz>0</iyz>
+          <izz>1.0e-7</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ── Rotor FR (+x -y) ──────────────────────────────────────────── -->
+    <link name="rotor_fr">
+      <pose>0.040 -0.040 0.010 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+        <inertia>
+          <ixx>5.07e-8</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5.07e-8</iyy>
+          <iyz>0</iyz>
+          <izz>1.0e-7</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ── Rotor RL (-x +y) ──────────────────────────────────────────── -->
+    <link name="rotor_rl">
+      <pose>-0.040 0.040 0.010 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+        <inertia>
+          <ixx>5.07e-8</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5.07e-8</iyy>
+          <iyz>0</iyz>
+          <izz>1.0e-7</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ── Rotor RR (-x -y) ──────────────────────────────────────────── -->
+    <link name="rotor_rr">
+      <pose>-0.040 -0.040 0.010 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+        <inertia>
+          <ixx>5.07e-8</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5.07e-8</iyy>
+          <iyz>0</iyz>
+          <izz>1.0e-7</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder><radius>0.010</radius><length>0.002</length></cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ── Joints (fixed — eliminates ODE instability from locked revolute DoF) ── -->
+    <joint name="joint_fl" type="fixed">
+      <parent>base_link</parent>
+      <child>rotor_fl</child>
+    </joint>
+
+    <joint name="joint_fr" type="fixed">
+      <parent>base_link</parent>
+      <child>rotor_fr</child>
+    </joint>
+
+    <joint name="joint_rl" type="fixed">
+      <parent>base_link</parent>
+      <child>rotor_rl</child>
+    </joint>
+
+    <joint name="joint_rr" type="fixed">
+      <parent>base_link</parent>
+      <child>rotor_rr</child>
+    </joint>
+
+    <!-- ── Ground truth odometry (relay node converts to PoseStamped) ── -->
+    <plugin name="p3d_plugin" filename="libgazebo_ros_p3d.so">
+      <ros>
+        <namespace>/drone</namespace>
+      </ros>
+      <body_name>base_link</body_name>
+      <frame_name>world</frame_name>
+      <update_rate>100.0</update_rate>
+    </plugin>
+
+    <!-- ── Single body wrench: force.z=thrust (body-Z), torque.xyz=attitude ── -->
+    <plugin name="body_wrench" filename="libgazebo_ros_force.so">
+      <ros>
+        <namespace>/microuwb</namespace>
+        <remapping>gazebo_ros_force:=body_wrench</remapping>
+      </ros>
+      <link_name>base_link</link_name>
+      <force_frame>link</force_frame>
+    </plugin>
+
+  </model>
+</sdf>

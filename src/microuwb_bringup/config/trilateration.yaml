@@ -1,0 +1,13 @@
+trilateration_node:
+  ros__parameters:
+    # Minimum total valid ranges (LOS + NLOS) needed to attempt a solve.
+    min_valid_ranges: 4
+
+    nonlinear_max_iter: 50
+    room_center: [2.5, 2.0, 1.5]
+    weight_by_variance: true
+
+    # Huber loss knee (metres). Residuals below this are quadratic (inlier);
+    # above this are linear (soft outlier). Tune down toward 0.15 if NLOS
+    # paths add >1 m bias; tune up toward 0.5 if the scene is mostly LOS.
+    f_scale_m: 0.30

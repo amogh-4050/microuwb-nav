@@ -8,4 +8,3 @@ numpy>=1.24
 matplotlib>=3.7
 h5py>=3.9
 pyyaml>=6.0
-# tensorflow is a sionna dependency — version pinned by sionna itself

@@ -1,11 +1,13 @@
 """Trilateration node.
 
 Consumes /microuwb/ranges (UWBRangeArray) and publishes a per-cycle 3D
-position estimate via weighted nonlinear least-squares (Levenberg-Marquardt).
-No temporal filtering — that's step 5 (EKF).
+position estimate via weighted nonlinear least-squares with Huber robust loss.
+NLOS measurements are included but down-weighted when their residuals exceed
+f_scale_m — no hard drop. No temporal filtering — that's step 5 (KF).
 
 Math reference: Core Electronics tutorial linearization as warm-start, then
-scipy.optimize.least_squares with residual weighting by 1/sqrt(variance).
+scipy.optimize.least_squares (TRF + Huber) with residual weighting by
+1/sqrt(variance).
 """
 
 from __future__ import annotations
@@ -35,6 +37,7 @@ class TrilaterationNode(Node):
         self.declare_parameter("nonlinear_max_iter", 50)
         self.declare_parameter("room_center", [2.5, 2.0, 1.5])
         self.declare_parameter("weight_by_variance", True)
+        self.declare_parameter("f_scale_m", 0.30)
 
         self._min_valid   = self.get_parameter("min_valid_ranges").get_parameter_value().integer_value
         self._max_nfev    = self.get_parameter("nonlinear_max_iter").get_parameter_value().integer_value
@@ -42,9 +45,12 @@ class TrilaterationNode(Node):
             self.get_parameter("room_center").get_parameter_value().double_array_value
         )
         self._weight      = self.get_parameter("weight_by_variance").get_parameter_value().bool_value
+        self._f_scale     = self.get_parameter("f_scale_m").get_parameter_value().double_value
 
         self._anchor_positions: dict[int, np.ndarray] = {}
         self._last_estimate: np.ndarray | None = None
+        self._skipped_cycles = 0
+        self._nlos_included_cycles = 0
 
         transient_qos = QoSProfile(
             depth=1,
@@ -75,11 +81,15 @@ class TrilaterationNode(Node):
         if not self._anchor_positions:
             return
 
-        # Collect (anchor_pos, range_m, variance) for known anchors
+        # Include all valid ranges — NLOS measurements are down-weighted by Huber
+        # loss in _solve() when their residuals exceed f_scale_m, rather than dropped.
         measurements: list[tuple[np.ndarray, float, float]] = []
+        n_nlos = 0
         for r in msg.ranges:
             if r.anchor_id not in self._anchor_positions:
                 continue
+            if not r.line_of_sight:
+                n_nlos += 1
             measurements.append((
                 self._anchor_positions[r.anchor_id],
                 float(r.range_m),
@@ -87,11 +97,17 @@ class TrilaterationNode(Node):
             ))
 
         if len(measurements) < self._min_valid:
-            self.get_logger().warn(
-                f"Only {len(measurements)} valid ranges (need {self._min_valid}) — skipping.",
-                throttle_duration_sec=5.0,
+            self.get_logger().debug(
+                f"Only {len(measurements)} valid ranges (need {self._min_valid}) — skipping cycle."
             )
+            self._skipped_cycles += 1
             return
+
+        if n_nlos > 0:
+            self._nlos_included_cycles += 1
+            self.get_logger().debug(
+                f"{n_nlos} NLOS anchor(s) included via Huber weighting (f_scale={self._f_scale:.2f}m)"
+            )
 
         estimate = self._solve(measurements)
         if estimate is None:
@@ -141,7 +157,14 @@ class TrilaterationNode(Node):
             return weights * (predicted - ranges)
 
         try:
-            result = least_squares(residuals, x0, method="lm", max_nfev=self._max_nfev)
+            # TRF required for Huber loss (method='lm' ignores loss parameter).
+            result = least_squares(
+                residuals, x0,
+                method="trf",
+                loss="huber",
+                f_scale=self._f_scale,
+                max_nfev=self._max_nfev,
+            )
             return result.x
         except Exception as exc:  # noqa: BLE001 — fall back, don't crash
             self.get_logger().warn(f"Nonlinear solver failed ({exc}); using linear estimate.")
@@ -183,5 +206,10 @@ def main(args=None) -> None:
     try:
         rclpy.spin(node)
     finally:
+        print(
+            f"[trilateration] shutdown: {node._skipped_cycles} skipped cycles "
+            f"(valid ranges < {node._min_valid}), "
+            f"{node._nlos_included_cycles} cycles with ≥1 NLOS anchor included via Huber"
+        )
         node.destroy_node()
         rclpy.shutdown()

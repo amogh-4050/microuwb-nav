@@ -1,0 +1,38 @@
+flight_controller:
+  ros__parameters:
+    use_ground_truth: true   # true = /drone/ground_truth_pose; false = KF output
+    arm_delay_s: 5.0
+
+    # Hover feedforward
+    hover_thrust: 0.57
+
+    # Outer position loop
+    kp_pos_xy: 3.0
+    ki_pos_xy: 0.06
+    kd_pos_xy: 1.5
+    kp_pos_z:  3.0
+    ki_pos_z:  0.06
+    kd_pos_z:  1.5
+
+    # Predictive lookahead — compensates for attitude loop lag in XY braking
+    lookahead_s: 0.36
+
+    # Inner attitude loop
+    kp_att_roll:  0.29
+    ki_att_roll:  0.005
+    kd_att_roll:  0.016
+    kp_att_pitch: 0.29
+    ki_att_pitch: 0.005
+    kd_att_pitch: 0.017
+    kp_att_yaw:   0.05
+    ki_att_yaw:   0.002
+    kd_att_yaw:   0.009
+
+    # Limits
+    max_tilt_rad: 0.15
+    max_accel:    2.0
+
+    # Default setpoint
+    setpoint_x: 1.2
+    setpoint_y: 3.39
+    setpoint_z: 1.3

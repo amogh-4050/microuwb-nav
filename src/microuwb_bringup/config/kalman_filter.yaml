@@ -1,0 +1,23 @@
+kalman_filter:
+  ros__parameters:
+    # Process noise scalar — multiplied by I(6).
+    # Low = trust model more = smoother output. High = follows measurements faster.
+    process_noise_q: 0.01
+
+    # Measurement noise scalar — multiplied by I(3).
+    # Trilateration median ~5-6 cm → variance ~0.003 m². Small safety margin gives 0.02.
+    measurement_noise_r: 0.02
+
+    # Expected measurement period (unused at runtime — actual dt from timestamps)
+    dt_nominal_s: 0.10
+
+    # dt clamping: protects against jitter or near-zero dt causing numerical blow-up
+    dt_min_s: 0.05
+    dt_max_s: 0.20
+
+    # If timestamp gap exceeds this, reinitialize the filter
+    reset_gap_s: 0.5
+
+    # Initial covariance diagonal — position and velocity axes
+    initial_position_variance: 1.0
+    initial_velocity_variance: 1.0

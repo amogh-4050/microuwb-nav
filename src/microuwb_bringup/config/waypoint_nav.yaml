@@ -1,0 +1,10 @@
+waypoint_nav:
+  ros__parameters:
+    cruise_z: 1.3             # circle flight altitude (m)
+    cuboid_z_low: 1.0         # cuboid bottom face Z (m)
+    cuboid_z_high: 1.6        # cuboid top face Z (m)
+    arrival_radius_m: 0.30    # drone within this radius = arrived at waypoint
+    dwell_s: 2.0              # seconds to pause at each waypoint before advancing
+    circle_points: 12         # number of points on the circle trajectory
+    circle_radius_m: 1.4      # circle radius (m) — centred at (2.5, 2.0)
+    publish_hz: 5.0           # setpoint publish rate (Hz)

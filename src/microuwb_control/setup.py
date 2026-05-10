@@ -24,6 +24,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'flight_controller = microuwb_control.flight_controller:main',
+            'respawn_guard = microuwb_control.respawn_guard:main',
+            'test_setpoint_publisher = microuwb_control.test_setpoint_publisher:main',
+            'waypoint_nav = microuwb_control.waypoint_nav:main',
         ],
     },
 )
